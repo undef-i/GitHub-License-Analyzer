@@ -793,7 +793,7 @@ const LICENSE_DATABASE: { [key: string]: LicenseInfo } = {
       zh: '创作共用许可证家族，主要用于创意作品，不推荐用于软件。'
     },
     permissiveness: 5,
-    category: 'other',
+    category: 'permissive',
     pros: {
       en: ['Creative-friendly', 'Multiple options', 'International recognition'],
       zh: ['创意友好', '多种选择', '国际认可']
@@ -1652,8 +1652,8 @@ export default function Home() {
 
       tooltip: {
         callbacks: {
-          label: function(context: { dataset: { label: string }, parsed: { y: number } }) {
-            return `${context.dataset.label}: ${context.parsed.y}%`
+          label: function(tooltipItem: any) {
+            return `${tooltipItem.dataset.label || ''}: ${tooltipItem.parsed.y}%`
           }
         }
       }
@@ -1852,7 +1852,7 @@ export default function Home() {
                                 <Space direction="vertical" size="middle" style={{ width: '100%' }}>
                                   <div>
                                     <Title level={5} style={{ margin: 0, marginBottom: '8px' }}>{t.description}</Title>
-                                    <Paragraph style={{ margin: 0 }}>{typeof licenseInfo.description === 'object' && licenseInfo.description[language] ? licenseInfo.description[language] : licenseInfo.description}</Paragraph>
+                                    <Paragraph style={{ margin: 0 }}>{typeof licenseInfo.description === 'object' && licenseInfo.description[language] ? licenseInfo.description[language] : typeof licenseInfo.description === 'string' ? licenseInfo.description : ''}</Paragraph>
                                   </div>
                                   
                                   <div>
@@ -1870,7 +1870,7 @@ export default function Home() {
                                         <CheckCircleOutlined /> {t.advantages}
                                       </Title>
                                       <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                                        {(typeof licenseInfo.pros === 'object' && licenseInfo.pros[language] ? licenseInfo.pros[language] : licenseInfo.pros).map((pro, index) => (
+                                        {(typeof licenseInfo.pros === 'object' && licenseInfo.pros[language] ? licenseInfo.pros[language] : Array.isArray(licenseInfo.pros) ? licenseInfo.pros : []).map((pro, index) => (
                                           <li key={index} style={{ marginBottom: '4px' }}>{pro}</li>
                                         ))}
                                       </ul>
@@ -1880,7 +1880,7 @@ export default function Home() {
                                         <CloseCircleOutlined /> {t.disadvantages}
                                       </Title>
                                       <ul style={{ margin: 0, paddingLeft: '20px' }}>
-                                        {(typeof licenseInfo.cons === 'object' && licenseInfo.cons[language] ? licenseInfo.cons[language] : licenseInfo.cons).map((con, index) => (
+                                        {(typeof licenseInfo.cons === 'object' && licenseInfo.cons[language] ? licenseInfo.cons[language] : Array.isArray(licenseInfo.cons) ? licenseInfo.cons : []).map((con, index) => (
                                           <li key={index} style={{ marginBottom: '4px' }}>{con}</li>
                                         ))}
                                       </ul>
@@ -1891,7 +1891,7 @@ export default function Home() {
                                     <Col xs={24} sm={12}>
                                       <Title level={5} style={{ margin: 0, marginBottom: '8px', color: '#1890ff' }}>{t.suitableFor}</Title>
                                       <div>
-                                        {(typeof licenseInfo.bestFor === 'object' && licenseInfo.bestFor[language] ? licenseInfo.bestFor[language] : licenseInfo.bestFor).map((scenario, index) => (
+                                        {(typeof licenseInfo.bestFor === 'object' && licenseInfo.bestFor[language] ? licenseInfo.bestFor[language] : Array.isArray(licenseInfo.bestFor) ? licenseInfo.bestFor : []).map((scenario, index) => (
                                           <Tag key={index} color="blue" style={{ marginBottom: '4px' }}>{scenario}</Tag>
                                         ))}
                                       </div>
@@ -1899,7 +1899,7 @@ export default function Home() {
                                     <Col xs={24} sm={12}>
                                       <Title level={5} style={{ margin: 0, marginBottom: '8px', color: '#faad14' }}>{t.notRecommendedFor}</Title>
                                       <div>
-                                        {(typeof licenseInfo.notRecommendedFor === 'object' && licenseInfo.notRecommendedFor[language] ? licenseInfo.notRecommendedFor[language] : licenseInfo.notRecommendedFor).map((scenario, index) => (
+                                        {(typeof licenseInfo.notRecommendedFor === 'object' && licenseInfo.notRecommendedFor[language] ? licenseInfo.notRecommendedFor[language] : Array.isArray(licenseInfo.notRecommendedFor) ? licenseInfo.notRecommendedFor : []).map((scenario, index) => (
                                           <Tag key={index} color="orange" style={{ marginBottom: '4px' }}>{scenario}</Tag>
                                         ))}
                                       </div>
@@ -1925,7 +1925,7 @@ export default function Home() {
                                         <LinkOutlined /> {repo.name}
                                       </a>
                                       {repo.fork && <Tag color="orange"><ForkOutlined /> Fork</Tag>}
-                                      {repo.stargazers_count > 0 && (
+                                      {repo.stargazers_count && repo.stargazers_count > 0 && (
                                         <Tag color="gold">
                                           <StarOutlined /> {repo.stargazers_count}
                                         </Tag>
