@@ -17,6 +17,7 @@ interface LicenseData {
 }
 
 interface Repository {
+  id: number
   name: string
   html_url: string
   fork: boolean
@@ -25,6 +26,7 @@ interface Repository {
   } | null
   stargazers_count?: number
   language?: string
+  description?: string
 }
 
 interface LicensePreference {
@@ -1313,8 +1315,9 @@ export default function Home() {
       setAllRepos(repos)
       setDataFetched(true)
       generateLicensePreferences(repos)
-    } catch (err: any) {
-      if (err.response?.status === 404) {
+    } catch (err: unknown) {
+      const axiosError = err as { response?: { status: number } }
+      if (axiosError.response?.status === 404) {
         setError(t.userNotFound)
       } else {
         setError(t.fetchError)
@@ -1330,7 +1333,7 @@ export default function Home() {
     const licenses: LicenseData = {}
     
     filteredRepos.forEach((repo: Repository) => {
-      const licenseName = repo.license?.name || t.noLicense
+      const licenseName = repo.license?.name || 'No License'
       if (!licenses[licenseName]) {
         licenses[licenseName] = []
       }
@@ -1344,7 +1347,7 @@ export default function Home() {
     const licenseStats: { [key: string]: { count: number, stars: number } } = {}
     
     repos.forEach(repo => {
-      const licenseName = repo.license?.name || t.noLicense
+      const licenseName = repo.license?.name || 'No License'
       if (!licenseStats[licenseName]) {
         licenseStats[licenseName] = { count: 0, stars: 0 }
       }
@@ -1354,7 +1357,7 @@ export default function Home() {
 
     const totalRepos = repos.filter(repo => repo.license?.name).length
     const prefs: LicensePreference[] = Object.entries(licenseStats)
-      .filter(([license]) => license !== t.noLicense)
+      .filter(([license]) => license !== 'No License')
       .map(([license, stats]) => {
         const avgStars = stats.count > 0 ? stats.stars / stats.count : 0
         const usage = stats.count / totalRepos
@@ -1569,10 +1572,10 @@ export default function Home() {
 
   const getSortedLicenses = () => {
     const entries = Object.entries(filteredLicenseData)
-    let filtered = includeNoLicense ? entries : entries.filter(([license]) => license !== t.noLicense)
+    let filtered = includeNoLicense ? entries : entries.filter(([license]) => license !== 'No License')
     
-    const withoutNoLicense = filtered.filter(([license]) => license !== t.noLicense)
-    const noLicense = filtered.filter(([license]) => license === t.noLicense)
+    const withoutNoLicense = filtered.filter(([license]) => license !== 'No License')
+    const noLicense = filtered.filter(([license]) => license === 'No License')
     
     withoutNoLicense.sort(([,a], [,b]) => b.length - a.length)
     
@@ -1629,7 +1632,7 @@ export default function Home() {
 
       tooltip: {
         callbacks: {
-          label: function(context: any) {
+          label: function(context: { dataset: { label: string }, parsed: { y: number } }) {
             return `${context.dataset.label}: ${context.parsed.y}%`
           }
         }
@@ -1645,7 +1648,7 @@ export default function Home() {
           text: t.percentageAxis
         },
         ticks: {
-          callback: function(value: any) {
+          callback: function(value: string | number) {
             return value + '%'
           }
         }
@@ -1662,13 +1665,21 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-50 py-4 sm:py-8">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div className="text-center mb-6 sm:mb-8">
           <div className="flex justify-center mb-4">
             <Select
               value={language}
               onChange={setLanguage}
               className="w-32"
+              style={{ 
+                border: '1px solid #d1d5db', 
+                borderRadius: '6px', 
+                backgroundColor: '#ffffff',
+                minHeight: '32px',
+                display: 'flex',
+                alignItems: 'center'
+              }}
               suffixIcon={<GlobalOutlined />}
             >
               <Select.Option value="en">English</Select.Option>
@@ -1784,10 +1795,12 @@ export default function Home() {
                       return {
                         key: license,
                         label: (
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                            <span style={{ fontWeight: 'bold', fontSize: '14px' }}>
-                              {license === t.noLicense ? t.noLicense : license}
-                            </span>
+                          <div className="ant-collapse-header-text">
+                            <div>
+                              <span style={{ fontWeight: 'bold', fontSize: '14px' }}>
+                                {license}
+                              </span>
+                            </div>
                             <div className="flex flex-wrap gap-1">
                               <Tag color="blue" style={{ fontSize: '11px', margin: 0 }}>{repos.length} repos</Tag>
                               <Tag color="green" style={{ fontSize: '11px', margin: 0 }}>{percentage}%</Tag>

@@ -25,3 +25,20 @@ body {
     )
     rgb(var(--background-start-rgb));
 }
+
+.ant-collapse-header-text {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.ant-collapse-header-text > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ant-collapse-header-text > div:last-child {
+  margin-left: auto;
+}
