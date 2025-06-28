@@ -78,6 +78,26 @@ interface I18nTexts {
   percentageAxis: string
   userNotFound: string
   fetchError: string
+  extremelyPermissive: string
+  highlyPermissive: string
+  moderatelyPermissive: string
+  moderatelyRestrictive: string
+  strictCopyleft: string
+  veryStrict: string
+  extremelyConservative: string
+  strongPreference: string
+  highQuality: string
+  frequentUse: string
+  moderateUse: string
+  stronglyRecommended: string
+  recommended: string
+  considerUse: string
+  specificScenarios: string
+  veryPermissive: string
+  moderatelyPermissiveLevel: string
+  moderateRestriction: string
+  strictRestriction: string
+  proprietaryRestricted: string
 }
 
 const I18N: Record<Language, I18nTexts> = {
